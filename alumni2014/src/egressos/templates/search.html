@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+				<div>
+					<h2>Pesquisar</h2> 
+					<form action="/search/" method="POST">
+					{% csrf_token %}
+					Digite o nome de quem você busca
+					<p>
+					<input type="text" size="45" name="termos" value="{{ termos }}"><p>
+					<input type="radio" name="boolean" value="and" checked="checked"> TODOS os termos
+					<input type="radio" name="boolean" value="or"> QUALQUER dos termos<p>
+					Ingresso:
+					<select name="ingresso">
+					    <option value="nenhum" {% if ingresso == "nenhum"  %} selected="selected" {% endif %}>Qualquer</option>
+					    {% for periodo in periodos %}
+							<option value="{{ periodo }}" {% if periodo == ingresso %}  selected="selected" {% endif %}>{{ periodo }}</option>
+					    {% endfor %}
+					</select>
+					Conclusão:
+					<select name="conclusao">
+					    <option value="nenhum" {% if conclusao == "nenhum"  %} selected="selected" {% endif %}>Qualquer</option>
+					    {% for periodo in periodos %}
+							<option value="{{ periodo }}" {% if periodo == conclusao %}  selected="selected" {% endif %}>{{ periodo }}</option>
+					    {% endfor %}
+					</select> <p>
+					<input Type=Submit Value="Pesquisar">
+					<p>
+					</form>
+					{% if registros|length > 0 %}
+					    <table border="0">
+					    <tr>
+					    <td width="500"><b>Nome</b></td>
+					    </tr>
+					    {% for registro in registros %}
+						<tr>
+						{% if registro.usuario %}
+						    <td><a href="/profile/{{ registro.usuario.id }}/">{{ registro.nome }}</a></td>
+						{% else %}
+						    <td><a href="/user_invite/{{ registro.id }}/">{{ registro.nome }}</a></td>
+						{% endif %}
+						</tr>
+					    {% endfor %}
+					    </table>
+					{% else %}
+					    Nenhum resultado encontrado
+					{% endif %}
+				</div>
+{% endblock %}

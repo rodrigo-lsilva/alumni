@@ -1,0 +1,36 @@
+{% extends "base.html" %} {% block content %}
+<div style="height: 400px; margin: auto;">
+	<script type="text/javascript">
+		function setOperacao(nomeElemento, valor){
+			var elemento = document.getElementById(nomeElemento);
+			alert(elemento.value)
+			elemento.value=valor;
+			alert(elemento.value)
+		}
+	</script>
+	<h2>Cadastro</h2>
+	Nessa página o administrador pode realizar cadastrar Centros, Unidades Acadêmicas e associar um usuário a um domínio.
+	<h2>Cadastro de Centros</h2>
+	<table>
+		<tr>
+			<td>Centros cadastrados:<br>
+				<form action="/alterarCentro/" method="post">{% csrf_token %}
+					<select name="centroSelecionado"> {% for c in centros %}
+						<option value="{{ c.id }}">{{ c.nome }}</option> {% endfor %}
+					</select>
+					<input type="hidden" id="operacaoCentro" value=""><br>
+					<input type="submit" value="Remover Centro Selecionado" onclick="setOperacao('operacaoCentro', 'remover')"><br>
+					<input type="submit" value="Editar Centro Selecionado" onclick="remover('operacaoCentro', 'editar')"><br>
+				</form>
+			</td>
+		</tr>
+		<tr>
+			<td>Criar Centro:
+				<form action="/adicionarCentro/" method="post">{% csrf_token %}
+					<input type="text" name="adicionarCentro"> <input type="submit" value="Adicionar Centro">
+				</form>
+			</td>
+		</tr>
+	</table>
+</div>
+{% endblock %}

@@ -1,0 +1,57 @@
+Sistema de Egresso
+
+O sistema alumni foi desenvolvido como parte das comemorações do aniversário de 40 anos do curso de sistemas e Computação da Universidade Federal de Campina Grande.
+
+contato: alumni@computacao.ufcg.edu.br
+
+
+=========================================================
+Instruções de instalação:
+
+O sistema foi desenvolvido em python utilizando o framework django.
+Para realizar a instalação no servidor apache, após a instalação do servidor apache, ative o módulo mod-wsgi. Em seguida, edite o arquivo httpd.conf, adicionando as linhas:
+
+WSGIScriptAlias / /<egressos>/egressos/wsgi.py
+WSGIPythonPath /<egressos>
+
+<Directory /<egressos>/egressos>
+	<Files wsgi.py>
+		Order deny,allow
+		Allow from all
+	</Files>
+</Directory>
+
+
+Onde <egressos> é o path do diretório contendo o código do alumni.
+
+Para maiores informações sobre instalação no servidor apache, consulte a documentação oficial do framework django:
+https://docs.djangoproject.com/en/1.7/howto/deployment/wsgi/modwsgi/
+
+
+=========================================================
+Banco de dados
+
+Na versão em produção é utilizado um banco de dados MySQL, porém vários outros bancos de dados relacionais podem ser utilizados. Para configurar o banco de dados, edite o arquivo egressos/settings.py.
+ 
+
+=========================================================
+Bibliotecas necessárias para instalação em servidor Debian, Ubuntu ou derivado com banco de dados MySQL:
+
+* matplotlib (apt-get install python-matplotlib);
+* Python PIL (Python Imaging Library);
+* psycopg2 (apt-get install python-psycopg2);
+* xlrd - necessário para a leitura de arquivos dados de arquivos no formato excel;
+* django - framework web;
+* python-mysqldb - Driver mysql para django.
+
+Observação: todos os pacotes são open-source.
+
+
+=========================================================
+Importando egressos para o sistema:
+python lendo.py planilha.xls
+
+O arquivo xls deve conter uma única planilha, com o nome "Exportar Planilha", contendo um aluno por linha, sendo que as 
+colunas são:
+CURSO, MATRICULA, NOME, SEXO, NASCIMENTO, FILIACAO_OU_MAE, PAI, NATURALIDADE1, NATURALIDADE2, ENDEREÇO, BAIRRO, MUNICIPIO, CEP, TELEFONE, EMAIL, INGRESSO, FORMA_INGRESSO, EVASAO, SITUACAO, UNIDADE_ACADEMICA(id).
+ 

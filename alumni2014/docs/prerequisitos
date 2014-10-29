@@ -1,0 +1,6 @@
+Pacotes django
+* xlrd - necessário para a leitura de arquivos dados de arquivos no formato excel
+* django - framework web
+
+Pacotes debian
+* python-mysqldb - Driver mysql para django

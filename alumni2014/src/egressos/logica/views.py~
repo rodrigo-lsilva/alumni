@@ -1,0 +1,416 @@
+# -*- coding: utf-8 -*-
+# Create your views here.
+from django.template.loader import render_to_string
+from django.core.mail import send_mail
+from django.core.validators import email_re
+from django.shortcuts import render_to_response, render
+from django.http import HttpResponseRedirect # Funcao para redirecionar o usuario
+from django.contrib.auth.forms import UserCreationForm # Formulario de criacao de usuarios
+from django.contrib.auth.forms import AuthenticationForm # Formulario de autenticacao de usuarios
+from django.contrib.auth import login, logout # funcao que salva o usuario na sessao
+from django.contrib.auth.models import User
+import emailconf
+import util
+from logica.models import Registro_Egresso, Usuario, Convite
+
+"""
+Define o ano de evasão do primeiro egresso
+"""
+ano_inicial = 1970
+ 
+
+def changepasswd(request):
+    if request.GET:
+        if request.GET.get("password") == None or request.GET.get("password") == "":
+            return render_to_response("changepasswd.html", {"user":request.user, "m3":"*Senha não foi digitada"})
+        if  request.GET.get("password") != request.GET.get("password2"):
+            return render_to_response("changepasswd.html", {"user":request.user, "m3":"*Senha diferente"})
+        request.user.set_password(request.GET.get("password"))
+        request.user.save()
+        return HttpResponseRedirect("/home/")
+    return render_to_response("changepasswd.html", {"user":request.user})
+
+def emailsave(request):
+    email = request.GET.get('email')
+    senha = request.GET.get('senha')    
+    assunto = request.GET.get("assunto")
+    corpo = request.GET.get("corpo")    
+    var = open("/egressos/logica/emailconf.py","w")
+    var.write("# -*- coding: utf-8 -*-")
+    var.write("\n")
+    var.write("email = '"+email+"'\n")
+    var.write("senha = '"+senha+"'\n")
+    var.write("assunto = '"+assunto+"'\n")
+    var.write("corpo = '"+corpo+"'")
+    var.close()
+    return render_to_response("email_save.html", {"user":request.user })
+
+def email(request):
+    import emailconf
+    return render_to_response("email.html", {"user":request.user, "email":emailconf.email, "senha":emailconf.senha,"assunto":emailconf.assunto,"corpo":emailconf.corpo })
+
+def main(request):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect("/home/")
+    if request.user.is_superuser:
+        return HttpResponseRedirect("/email/")
+    return HttpResponseRedirect("/profile/"+str(request.user.usuario.id))
+
+def myclass(request):
+    turma_ingresso = Registro_Egresso.objects.filter(ingresso__contains=request.user.usuario.registro.ingresso).order_by('nome')
+    turma_conclusao = Registro_Egresso.objects.filter(evasao__contains=request.user.usuario.registro.evasao).order_by('nome')
+    return render_to_response("my_class.html", {"user":request.user, "turmaingresso":turma_ingresso, "turmaconclusao":turma_conclusao })
+
+def exist(request, egresso_id):
+    egresso = Usuario.objects.get(id=egresso_id)
+    return render_to_response("exist.html", {"user":request.user, "egresso":egresso })
+
+def profile(request, egresso_id):
+    egresso = Usuario.objects.get(id=egresso_id)
+    return render_to_response("profile.html", {"user":request.user, "usuario":egresso })
+
+def invites(request):
+    help(request.user)
+    print "....."
+    convites = Convite.objects.filter(de=request.user.usuario)
+    return render_to_response("invites.html", {"user":request.user, "convites":convites })  
+
+"""
+Exibe o assistente de cadastro
+"""
+def wizard(request, registro_id, key):
+    print key
+    registro = Registro_Egresso.objects.get(id=registro_id)
+    if request.GET:
+        dia = int(request.GET.get("dia"))
+        mes = int(request.GET.get("mes"))
+        ano = int(request.GET.get("ano"))
+        if registro.nascimento != None and len(registro.nascimento.split(" ")[0].split("/")) == 3:
+            data = registro.nascimento.split(" ")[0].split("/")
+            dia_r = int(data[0])
+            mes_r = int(data[1])
+            ano_r = int(data[2][2:])
+            print dia, mes, ano
+            print dia_r, mes_r, ano_r
+            if dia != dia_r or mes != mes_r or ano != ano_r:
+                return render_to_response("real_wizard.html", {"user":request.user, "registro":registro, "key":key, "message": "A data difere do nosso registro" })
+            else:
+                convite = Convite.objects.get(key__contains=key)
+                convite.para = registro
+                convite.save()
+                return HttpResponseRedirect("/invite/"+key+"/")
+        else:
+            return render_to_response("real_wizard.html", {"user":request.user, "registro":registro, "key":key, "message":"Sua data de nascimento não consta nos nossos registros, entre em contato solicitando um convite através do e-mail: alumni@dsc.ufcg.edu.br" })
+    return render_to_response("real_wizard.html", {"user":request.user, "registro":registro, "key":key })
+
+def userinvite(request, registro_id):
+    message = ""
+    registro = Registro_Egresso.objects.get(id=registro_id)
+    try:
+        if registro.usuario:
+            return HttpResponseRedirect("/profile/"+str(registro.usuario.id)+"/")
+    except:
+        pass
+      
+    if request.GET:
+        print "enviou o email"
+        email = request.GET.get("email")
+        
+        if not email_re.match(email):
+	    message = "email invalido"
+	else:
+	    u_id = request.user.usuario.id
+	    r_id = registro_id
+	    email = request.GET.get("email")
+	    u = Usuario.objects.get(id=u_id)
+	    r = Registro_Egresso.objects.get(id=r_id)
+	    
+	    convites = Convite.objects.filter(de=u)
+	    convites = convites.filter(para=r)
+	    convites = convites.filter(email=email)
+	    if len(convites) == 0:
+		c = Convite()
+		c.de = u
+		c.para = r
+		c.email = email
+		c.status = "pendente"
+		c.save()
+		c.key = util.generate_key(c.id)
+		c.save()
+                context = {"link":('http://alumni.dsc.ufcg.edu.br/invite/'+c.key)}
+                send_mail(emailconf.assunto.replace("{{ de }}", request.user.usuario.nome_atual), render_to_string('template_email.html', context), emailconf.email, [c.email], fail_silently=False)
+		message = "Convite enviado com sucesso para: "
+		clean_emails = [email]
+		return render_to_response("sent.html", {"user":request.user, "message":message, "clean":clean_emails })
+	    else:
+	        message = "Voce ja enviou convite para esse e-mail"
+	    
+    return render(request, "user_invite.html", {"user":request.user, "registro":registro, "message":message })
+
+def get_estatisticas():
+    
+    maior = None
+    n = 0
+    menor = None
+    n2 = 1000000
+    for periodo in range(ano_inicial, util.getProximoAno()):
+        registros = Registro_Egresso.objects.filter(evasao__contains=str(periodo)+".1")
+        if maior == None or len(registros) > n:
+	    maior = str(periodo)+".1"
+	    n = len(registros)
+	if (menor == None or len(registros) < n2) and len(registros) != 0:
+	    menor = str(periodo)+".1"
+	    n2 = len(registros)
+	registros = Registro_Egresso.objects.filter(evasao__contains=str(periodo)+".2")
+	if maior == None or len(registros) > n:
+	    maior = str(periodo)+".2"
+	    n = len(registros)
+	if (menor == None or len(registros) < n2) and len(registros) != 0	:
+	    menor = str(periodo)+".2"
+	    n2 = len(registros)
+    
+    estatisticas = [
+        len(Registro_Egresso.objects.all()),
+        len(Registro_Egresso.objects.filter(curso__contains="PROCESSAMENTO")),
+        len(Registro_Egresso.objects.filter(curso__contains="CIENCIA")),
+        808,
+        (len(Registro_Egresso.objects.all()) - 808),
+        len(Usuario.objects.all()),
+        len(Registro_Egresso.objects.all()) - len(Usuario.objects.all()),
+      #n,
+      #menor,
+      #n2,
+      #len(Registro_Egresso.objects.all()),
+      #len(Registro_Egresso.objects.filter(sexo__contains="F")),
+      #len(Registro_Egresso.objects.filter(sexo__contains="M")),
+      #len(Usuario.objects.all()),
+      #9,10,11,12,13
+      ]
+    return estatisticas
+
+def home(request):
+    usuarios = Usuario.objects.all()[::-1][:10]
+    estatisticas = get_estatisticas()
+    return render_to_response("home.html", {"user":request.user, "usuarios":usuarios, "estatisticas":estatisticas })
+
+def registrado(request, convite):
+    convite.status = "ok"
+    convite.save()
+    username = request.GET.get("username")
+    senha = request.GET.get("password")
+
+    django_user = User.objects.create_user(username, password=senha)
+    django_user.save()
+
+    u = Usuario()
+    u.nome_atual = request.GET.get('nome_atual')
+    u.cidade = request.GET.get('cidade')
+    u.pais = request.GET.get('pais')
+    u.onde_trabalha = request.GET.get('onde_trabalha')
+    u.ocupacao = request.GET.get('ocupacao')
+    u.setor_atucao = request.GET.get('setor_atucao')
+    u.privacidade = request.GET.get('privacidade')
+    u.pagina_web = request.GET.get('pagina_web')
+    
+    u.usuario = django_user
+    u.registro = convite.para
+    u.save()
+
+def invite(request, key):
+    periodos = []
+    registros = []
+    for ano in range(ano_inicial, util.getProximoAno()):
+        periodos.append(str(ano)+".1")
+        periodos.append(str(ano)+".2")
+    if request.user.is_authenticated():
+        logout(request)
+    convite = Convite.objects.get(key__contains=key)
+    if convite.status == "ok":
+        return render_to_response("used.html", {"user":request.user})
+    if convite.de.registro == convite.para:
+        # convite para email
+        if request.GET:
+	    codigos = ['\xc3\x83', '\xc3\xa3', '\xc3\x95', '\xc3\xb5', '\xc3\x81', '\xc3\xa1', '\xc3\x89', '\xc3\xa9', '\xc3\x8d', '\xc3\xad', '\xc3\x93', '\xc3\xb3', '\xc3\x9a', '\xc3\xba', '\xc3\x82', '\xc3\xa2', '\xc3\x8a', '\xc3\xaa', '\xc3\x8e', '\xc3\xae', '\xc3\x94', '\xc3\xb4', '\xc3\x9b', '\xc3\xbb']
+            traducao = "AaOoAaEeIiOoUuAaEeIiOoUu"
+
+	    boolean = request.GET['boolean']
+	    termos = request.GET.get("termos").rstrip().lstrip()
+            safe_termos = termos.encode('utf-8', 'ignore')
+	    ingresso = request.GET.get("ingresso")
+	    conclusao = request.GET.get("conclusao")
+	    termos = termos.split(" ")
+	    safe_termos = safe_termos.split(" ")
+            for i in range(len(safe_termos)):
+                for j in range(len(codigos)):
+                    safe_termos[i] = safe_termos[i].replace(codigos[j],traducao[j])
+
+	    termos = safe_termos    	 
+	    registros = Registro_Egresso.objects.filter(nome__contains=str(termos[0]).upper())
+	    for i in range(len(termos)):
+		temp = Registro_Egresso.objects.filter(nome__contains=str(termos[i]).upper())
+		if boolean == "and":
+		    registros = temp & registros
+		else:
+		    registros = temp | registros
+	    if ingresso != "nenhum":
+		registros = registros.filter(ingresso__contains=str(ingresso))
+	    if conclusao != "nenhum":
+		registros = registros.filter(evasao__contains=str(conclusao))
+	    registros = registros.order_by("nome")
+	    return render_to_response("wizard.html", {"user":request.user, "convite":convite, "registros":registros, "periodos":periodos })
+	return render_to_response("wizard.html", {"user":request.user, "convite":convite, "registros":registros, "periodos":periodos })
+            
+    else:
+        # convite direto
+        if request.GET:
+            if request.GET.get("nome_atual") == "":
+                return render_to_response("invite.html", {"user":request.user, "convite":convite, "m1":"*Nome requerido" })
+            email = request.GET.get("username")
+            if not email_re.match(email):
+                return render_to_response("invite.html", {"user":request.user, "convite":convite, "m2":"*E-mail invalido" })
+            if len(User.objects.filter(username=email)) != 0:
+                return render_to_response("invite.html", {"user":request.user, "convite":convite, "m2":"*E-mail '"+email+"' ja cadastrado" })
+            if request.GET.get("password") == None or request.GET.get("password") == "":
+                return render_to_response("invite.html", {"user":request.user,"convite":convite,  "m3":"*Senha não foi digitada" })
+            if request.GET.get("password") != request.GET.get("password2"):
+                return render_to_response("invite.html", {"user":request.user, "convite":convite, "m3":"*Senha diferente" })
+            registrado(request, convite)
+            return HttpResponseRedirect("/login/")
+    return render_to_response("invite.html", {"user":request.user, "convite":convite })
+
+def search(request):
+    periodos = []
+    registros = []
+    for ano in range(ano_inicial, util.getProximoAno()):
+        periodos.append(str(ano)+".1")
+        periodos.append(str(ano)+".2")
+    
+    if request.GET:
+        codigos = ['\xc3\x83', '\xc3\xa3', '\xc3\x95', '\xc3\xb5', '\xc3\x81', '\xc3\xa1', '\xc3\x89', '\xc3\xa9', '\xc3\x8d', '\xc3\xad', '\xc3\x93', '\xc3\xb3', '\xc3\x9a', '\xc3\xba', '\xc3\x82', '\xc3\xa2', '\xc3\x8a', '\xc3\xaa', '\xc3\x8e', '\xc3\xae', '\xc3\x94', '\xc3\xb4', '\xc3\x9b', '\xc3\xbb']
+        traducao = "AaOoAaEeIiOoUuAaEeIiOoUu"
+        boolean = request.GET['boolean']
+        termos = request.GET.get("termos").rstrip().lstrip()
+        safe_termos = termos.encode('utf-8', 'ignore')
+        ingresso = request.GET.get("ingresso")
+        conclusao = request.GET.get("conclusao")
+        safe_termos = safe_termos.split(" ")
+        for i in range(len(safe_termos)):
+	    for j in range(len(codigos)):
+	        safe_termos[i] = safe_termos[i].replace(codigos[j],traducao[j])
+        print "TERMOS: ", termos
+        print "SAFE: ", safe_termos
+#        registros = Registro_Egresso.objects.filter(nome__contains=str(termos[0]))
+	registros = Registro_Egresso.objects.filter(nome__contains=str(safe_termos[0]).upper())
+        print "REGISTROS: ", registros
+        for i in range(len(safe_termos)):
+	    temp = Registro_Egresso.objects.filter(nome__contains=str(safe_termos[i]).upper())
+	    if boolean == "and":
+	        registros = temp & registros
+	    else:
+	        registros = temp | registros
+        if ingresso != "nenhum":
+	    registros = registros.filter(ingresso__contains=str(ingresso))
+        if conclusao != "nenhum":
+	    registros = registros.filter(evasao__contains=str(conclusao))
+	registros = registros.order_by('nome')
+    return render_to_response("search.html", {"user":request.user, "periodos":periodos, "registros":registros })        
+
+def multipleinvite(request):
+    e = ""
+    clean_emails = []
+    message = ""
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect("/login/")
+    if request.GET:
+        emails = request.GET.get("emails").split(",")
+        for i in range(len(emails)):
+            emails[i] = emails[i].rstrip().lstrip()
+            if not email_re.match(emails[i]):
+                message = emails[i]+": email invalido"
+	        break
+	if message == "":
+	    message = "Convite enviado com sucesso para os emails:"
+	    for e in emails:
+	        c = Convite()
+		c.de = request.user.usuario
+		# quando eh anonimo ele manda convite pra ele mesmo
+		c.para = c.de.registro
+		c.email = e
+		c.status = "pendente"
+		c.save()
+		c.key = util.generate_key(c.id)
+		c.save()
+                context = {"link":('http://alumni.dsc.ufcg.edu.br/invite/'+c.key)}
+                send_mail(emailconf.assunto.replace("{{ de }}", request.user.usuario.nome_atual), render_to_string('template_email.html', context), emailconf.email, [c.email], fail_silently=False)
+	        clean_emails.append(e)
+	    return render_to_response("sent.html", {"user":request.user, "message":message, "clean":clean_emails, "emails":e })
+    return render_to_response("multiple_invite.html", {"user":request.user, "message":message, "clean":clean_emails, "emails":e })
+
+def save(request):
+    status = "nada aconteceu"
+    
+    if request.GET:
+        if request.user is not None:
+            u = Usuario.objects.filter(usuario__id=request.user.id)[0]
+            u.nome_atual = request.GET.get('nome_atual')
+            u.cidade = request.GET.get('cidade')
+            u.pais = request.GET.get('pais')
+            u.onde_trabalha = request.GET.get('onde_trabalha')
+            u.ocupacao = request.GET.get('ocupacao')
+            u.setor_atucao = request.GET.get('setor_atucao')
+            u.privacidade = request.GET.get('privacidade')
+            u.pagina_web = request.GET.get('pagina_web')
+            u.save()
+            status = "Dados salvos"
+            print u.privacidade
+        else:
+	    status = "Dados nao foram salvos"
+    print status	  
+    return HttpResponseRedirect("/profile/"+str(request.user.usuario.id)) 
+    
+
+def edit(request):
+    if not request.user.is_authenticated():    
+        return HttpResponseRedirect("/login/") 
+    return render_to_response("edit.html", {"user":request.user })
+
+def mylogout(request):
+    logout(request)
+    return HttpResponseRedirect("/") # redireciona o usuario logado para a pagina inicial
+
+# pagina de cadastro de jogador
+def registrar(request):
+    # Se dados forem passados via POST
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+         
+        if form.is_valid(): # se o formulario for valido
+            form.save() # cria um novo usuario a partir dos dados enviados 
+            return HttpResponseRedirect("/login/") # redireciona para a tela de login
+        else:
+            # mostra novamente o formulario de cadastro com os erros do formulario atual
+            return render(request, "registrar.html", {"form": form })
+     
+    # se nenhuma informacao for passada, exibe a pagina de cadastro com o formulario
+    return render(request, "registrar.html", {"form": UserCreationForm() })
+ 
+ 
+def logar(request):
+    if request.user.is_authenticated():
+        return HttpResponseRedirect("/")
+
+    if request.method == 'POST':
+        form = AuthenticationForm(data=request.POST)
+         
+        if form.is_valid():
+            login(request, form.get_user())
+            return HttpResponseRedirect("/")
+        else:
+            return render(request, "logar.html", {"form": form})
+    return render(request, "logar.html", {"form": AuthenticationForm() })
+
+
+def favicon(request):
+    return HttpResponseRedirect("/static/logica/images/favicon.ico")
+
+

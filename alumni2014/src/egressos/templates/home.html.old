@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+<div>
+	<h2>
+		
+		Seja bem-vindo <a href="/profile/{{ user.usuario.id }}">
+		{{ user.usuario.nome_atual }}</a>
+	</h2>
+	<p>
+		Em 2013 o Departamento de Sistemas e Computação da UFCG completa 40
+		anos de fundação. Nesses anos, formamos
+		<total de egressos>{{ estatisticas.0 }} profissionais, que são
+		reconhecidos no mercado de trabalho pela sua competência e ética
+		profissional. Desses, <total de alunos formados em tecnólogo>{{ estatisticas.1 }} foram formados no curso de Tecnólogo em
+		Processamento de Dados, enquanto que <total de alunos formados em CC>{{	estatisticas.2 }} foram formados em Ciência da Computação; <total de
+			formadosaté 2002.1>{{ estatisticas.3 }} foram diplomados
+		pela UFPB, quando o DSC ainda era vinculado àquela universidade,
+		enquanto <total de formados depoisde 2002.1>{{ estatisticas.4 }} foram diplomados pela UFCG.
+
+		<p>Para comemorar esses 40 anos de sucesso, estamos realizando uma
+			série de iniciativas, entre as quais a criação deste sistema de
+			egressos.</p>
+
+		<p>Os objetivos do sistema são, por um lado, criar um canal de
+			comunicação que permita mantermos um contato mais próximo com nossos
+			ex-alunos, e por outro, servir de ponto de encontro virtual para
+			nossos egressos.</p>
+
+		<p>
+			No momento temos
+			<total cadastrados>{{ estatisticas.5 }} egressos cadastrados.
+			Pedimos a sua colaboração para nos ajudar a encontrar os <total não
+				cadastrado>{{ estatisticas.6 }} que ainda não se
+			cadastraram. Faça login no sistema e convide seus ex-colegas a se
+			cadastrarem também. Isso pode ser feito de forma simples e rápida!
+		</p>
+
+		<p>Se você não ainda não está cadastrado(a) mande um email para
+			alumni@computacao.ufcg.edu.br solicitando um convite.</p>
+		<h1>Últimos usuários cadastrados no sistema</h1>
+		<p>
+			{% for u in usuarios %} <a href="/profile/{{ u.id }}"> {{ u }}</a>
+				com ingresso em {{ u.registro.ingresso }} e conclusão em {{ u.registro.evasao }} entrou no sistema.<br>
+ 			{% endfor %} </div>
+ {% endblock %}
+
+
+

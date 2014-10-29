@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+				<div>
+					<h2>Meus Convites</h2>
+					<table border="0">
+					<tr>
+					<td width=300><b>Para</b></td>
+					<td width=200><b>E-mail</b></td>
+					<td width=100><b>Status</b></td>
+					</tr>
+					{% for c in convites %}
+					    <tr>
+					    {% if c.de == c.para.usuario %}
+						<td>Convite Múltiplo</td>
+					    {% else %}
+						<td>{{ c.para.nome }}</td>
+					    {% endif %}
+					    <td>{{ c.email }}</td>
+					    {% if c.is_ok %}
+						<td><a href="/profile/{{ c.para.usuario.id }}">ACEITO</a> </br></td>
+					    {% else %}
+						<td>PENDENTE</td>
+					    {% endif %}
+					    </tr>
+					{% endfor %}
+					</table>
+					<br>
+				</div>
+{% endblock %}

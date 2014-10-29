@@ -1,0 +1,17 @@
+
+				<div>
+					<h2>
+{% if user.is_authenticated %}
+    {% if user.is_superuser %}
+        				<h2>Configuração de e-mail</h2> 
+Configurações salvas com sucesso.
+
+    {% else %}
+        Sem acesso
+    {% endif %}
+{% else %}
+    Sem acesso
+{% endif %}
+</h2>
+				</div>
+{% endblock %}

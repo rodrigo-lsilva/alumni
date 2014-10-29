@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+				<div>
+					<h2>Convidar</h2> 
+					<form methor="POST">{% csrf_token %}
+					    Convide seus amigos egressos colocando o e-mail deles abaixo separados por virgula ou fazendo um convite direto através da <a href="/search/">Pesquisa</a>. </br>
+					    <p><br> {{ message }}
+					    {% for email in clean %}
+						</br>{{ email }}
+					    {% endfor %}</p>
+					    <textarea rows="10" cols="70" name="emails" placeholder="exemplo@email.com, exemplo2@email.com, exemplo3@email.com"></textarea><br>
+					    <input type=submit value="Convidar">
+					</form>
+				</div>
+{% endblock %}

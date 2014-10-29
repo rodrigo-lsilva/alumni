@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+				<div>
+					<h2>Convite Enviado</h2> 
+					    <br> {{ message }}
+					    {% for email in clean %}
+						</br>{{ email }}
+					    {% endfor %}</p>
+				</div>
+{% endblock %}

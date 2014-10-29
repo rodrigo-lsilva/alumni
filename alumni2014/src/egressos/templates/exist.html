@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block content %}
+				<div>
+					<h2>Usuário já cadastrado</h2> 
+					O usuário selecionado já está cadastrado: <a href="/profile/{{ egresso.id }}/">{{ egresso.nome_atual }}</a>
+				</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+				<div>
+					<h2>Perfil de {{ usuario.registro.dados_atuais.nome_Atual }}</h2>
+					<p>
+					<span class="info">{{ message }}</span>
+					<p>
+					{% for c in usuario.registro.graduacao.all %}
+					<p><h3><b>Curso:</b> {{ c.curso }}</h3></p>
+					<p><b>Período de Ingresso:</b> {{ c.ingresso }}</p>
+					<p><b>Período de Conclusão:</b> {{ c.evasao }}</p>
+					{% endfor %}
+					
+					{% for c in usuario.registro.pos_graduacao.all %}
+					<p><h3><b>Curso:</b> {{ c.programa }}</h3></p>
+					<p><b>Período de Ingresso:</b> {{ c.ingresso }}</p>
+					<p><b>Período de Conclusão:</b> {{ c.evasao }}</p>
+					{% endfor %}
+					
+					{% if usuario.eh_privado and usuario != user.usuario%}
+					
+
+					{% else %}
+					    <p>
+					    <b>Cidade onde mora:</b> {{ usuario.registro.dados_atuais.cidade }}<p>
+					    <b>País onde mora:</b> {{ usuario.registro.dados_atuais.pais }}<p>
+					    <b>Local de Trabalho:</b> {{ usuario.registro.dados_atuais.onde_trabalha }}<p>
+					    <b>Ocupação:</b> {{ usuario.registro.dados_atuais.ocupacao }}<p>
+					    <b>Setor de Atuação:</b> {{ usuario.registro.dados_atuais.setor_atuacao }}<p>
+					    {% if usuario.web_ok %}
+						<b>Página Web:</b> <a href="{{ usuario.pagina_web }}">{{ usuario.registro.pagina_web }}</a><p>
+					    {% else %}
+						<b>Página Web:</b> <a href="http://{{ usuario.pagina_web }}">{{ usuario.registro.pagina_web }}</a><p>
+					    {% endif %}
+					{% endif %}
+				<form method="post" action="/merge/">{% csrf_token %}
+					<input type="hidden" value="{{ usuario.id }}" name="id_outro_usuario">
+					Alguns egressos podem ter mais de um cadastro. Caro {{ user.usuario }}, caso esse perfil também pertence a você, clique no botão junção para que os dois perfis sejam unidos em um único perfil.<br>
+					<input type="submit" value="Junção">		
+				</form>
+				</div>
+{% endblock %}

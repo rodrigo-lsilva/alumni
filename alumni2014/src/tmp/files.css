@@ -1,0 +1,33 @@
+from django.contrib.auth.models import User
+from egressos.logica.models import Registro_Egresso, Usuario, Convite, Dados_Atualizados, Graduacao, Pos_Graduacao
+from datetime import date
+user = User.objects.get(id=2)
+registro = Registro_Egresso()
+registro.bairro="bairro"
+registro.cep="123456"
+registro.email=user.email
+registro.endereco="rua"
+registro.filiacao_ou_mae="mãe"
+registro.pagina_web="www"
+registro.pai="pai"
+registro.municipio="m"
+registro.nascimento=date(1900,01,01)
+registro.naturalidade1="a"
+registro.naturalidade2="b"
+registro.nome=user.username
+registro.privacidade=Registro_Egresso.PRIVADO
+registro.sexo="M"
+registro.telefone="12345-4678"
+from egressos.logica.models import Dados_Atualizados
+dados=Dados_Atualizados()
+print dados
+dados.cidade=""
+dados.data_atualizacao=date(2013,01,01)
+dados.nome_Atual="Nome"
+dados.ocupacao=""
+dados.setor_atuacao=""
+dados.onde_trabalha="no trabalho"
+dados.pais="onde eu moro?"
+dados.save()
+
+

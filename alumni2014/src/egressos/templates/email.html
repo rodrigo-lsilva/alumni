@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+				<div>
+					<h2>
+{% if user.is_authenticated %}
+    {% if user.is_superuser %}
+        				<h2>Configuração de e-mail</h2> 
+					<form action="/email_save/" method="get">
+					<table border="0">
+					<tr>
+					<td width=80>Email</td>
+					<td><input type="text" name="email" value="{{ email }}" /><br /></td>
+					</tr>
+					<tr>
+					<td>Senha</td>
+					<td><input type="text" name="senha" value="{{ senha }}" /><br /></td>
+					</tr>
+					</table>
+					<p>
+					<br>Assunto<br>
+					<textarea rows="1" cols="70" name="assunto">{{ assunto }}</textarea>
+					<br>Corpo<br>
+					<textarea rows="10" cols="70" name="corpo">{{ corpo }}</textarea>
+					<br><input type="submit" value="Save" />
+					</form>
+
+    {% else %}
+        Sem acesso
+    {% endif %}
+{% else %}
+    Sem acesso
+{% endif %}
+</h2>
+				</div>
+{% endblock %} 

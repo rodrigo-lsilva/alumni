@@ -1,0 +1,12 @@
+{% extends "base.html" %} {% block content %}
+<div>
+	<h2>
+
+		Seja bem-vindo <a href="/profile/{{ user.usuario.id }}"> {{ user.usuario.nome_atual }}</a>
+	</h2>
+	<p>{{ texto | safe }}</p>
+</div>
+{% endblock %}
+
+
+

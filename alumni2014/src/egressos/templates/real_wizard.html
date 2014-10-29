@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+				<div>
+					<h2>Convite</h2> 
+					Olá {{ registro.nome }}. Nos ajuda a confirmar sua identidade.<br><br>
+
+					Qual sua data de nascimento?<p>
+					<FORM action="/wizard/{{ registro.id }}/{{ chave }}/" method="GET"> 
+					DD / MM / AA<br>
+					<INPUT Type=Text SIZE = 2 e MAXLENGTH = 2 Name=dia> / <INPUT Type=Text maxlength=2 Size=2 Name=mes> / <INPUT Type=Text maxlength=2 Size=2 Name=ano>
+					<INPUT Type=Submit Value="Continuar">
+					<br> {{ message }}
+					</form>
+				</div>
+{% endblock %}

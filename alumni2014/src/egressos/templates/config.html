@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+				<div style="height: 400px; margin: auto;">
+					<h2>Configuração do sistema</h2> 
+					<div class="errorlist"> {{ message }}</div>
+					<form action="/config/" method="post">{% csrf_token %}
+						Bem vindo a interface de configuração!<br>
+						Por favor, informe o id do Centro, Unidade Acadêmica ou Programa de Pós-graduação.<br>
+						<input type="text" name="id" size="4" value="{{ id }}"/><input type="submit" value="Salvar"><br>
+						Obs.: para obter um ID válido, entre em contato com o administrador do sistema. 
+						
+						 
+					</form>
+				</div>
+{% endblock %}

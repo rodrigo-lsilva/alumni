@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block content %}
+				<div>
+					<h2>Editar Dados</h2> 
+					<form action="/save/" method="post">{% csrf_token %}
+					
+                                        <p><a href="/changepasswd/">Mudar a senha</a></p>
+					<table border="0">
+					<tr>
+					<td width=130>Login</td><td style="font-weight: bolder">{{ usuario.usuario }} </td>
+					</tr><tr>
+					<td width=130>Como quer ser chamado</td>
+					<td><input type="text" name="nome_atual" value="{{ usuario.registro.dados_atuais.nome_Atual }}" /><br /></td>
+					</tr>
+					<tr>
+					<td>Cidade onde mora</td>
+					<td><input type="text" name="cidade" value="{{ usuario.registro.dados_atuais.cidade }}" /><br /></td>
+					</tr>
+					<tr>
+					<td>País onde mora</td>
+					<td><input type="text" name="pais" value="{{ usuario.registro.dados_atuais.pais }}" /><br /></td>
+					</tr>
+					<tr>
+					<td>Local de Trabalho</td>
+					<td><input type="text" name="onde_trabalha" value="{{ usuario.registro.dados_atuais.onde_trabalha }}" /><br /></td>
+					</tr>
+					<tr>
+					<td>Ocupação</td>
+					<td><input type="text" name="ocupacao" value="{{ usuario.registro.dados_atuais.ocupacao }}" /><br /></td>
+					</tr>
+					<tr>
+					<td>Setor de Atuação</td>
+					<td><input type="text" name="setor_atuacao" value="{{ usuario.registro.dados_atuais.setor_atuacao }}" /><br /></td>
+					</tr>
+					<tr>
+					<td>Página Web</td>
+					<td><input type="text" name="pagina_web" value="{{ usuario.registro.pagina_web }}" /><br /></td>
+					</tr>
+					<td>Privacidade</td>
+					{% if usuario.usuario.eh_privado %}
+					    <td><select name="privacidade">
+						<option value="privado">Só eu posso ver</option>
+						<option value="publico">Todos podem ver</option>
+					    </select> <br/></td>
+					{% else %}
+					    <td><select name="privacidade">
+						<option value="publico">Todos podem ver</option>
+						<option value="privado">Só eu posso ver</option>
+					    </select> <br/></td>
+					{% endif %}
+					</tr>
+					</table>
+					<input type="submit" value="Save" />
+					</form>
+				</div>
+{% endblock %}

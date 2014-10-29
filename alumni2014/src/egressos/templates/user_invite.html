@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+				<div>
+					<h2>Sem Perfil</h2>
+					O egresso {{ registro.nome }} ainda não se cadastrou no sistema.
+					<p>
+					{% if user.is_authenticated %}
+	                                    <p>
+					     
+					    <form method="GET">
+						Para convidar este egresso, adicione o email:
+						<input type="text" name="email" value="" />  {{ message }}<br /><p>
+						<p>
+						<input type="submit" value="Convidar" />
+					    </form>
+					{% else %}
+					    Faça login se quiser convidar este egresso.
+					{% endif %}
+				</div>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+				<div style="margin: auto;">
+					<form action="/personalizacao/" enctype="multipart/form-data" method="post">
+					{% csrf_token %}
+					<h3>Personalize a aparência e o conteúdo da página inicial.</h3><br>
+					<span class="info">{{ message }}</span>
+					<br>
+					<label for="cssFile" style="font-weight: bold;">Enviar novo arquivo css:</label> <input type="file" name="css" id="cssFile"><br><br>
+					Favicons logotipos utilizados nas abas do navegador e na barra de favoritos.<br>
+					<label for="faviconFile" style="font-weight: bold;">Enviar novo arquivo favicon:</label> <input type="file" name="favicon" id="faviconFile"><br><br>
+					O logotipo será exibido em todas as páginas do sistema. A imagem deve estar em formato PNG e o tamanho máximo deverá ser 456px de largura e 96px de altura.<br>
+					<label for="logoFile" style="font-weight: bold;">Enviar novo logotipo:</label> <input type="file" name="logo" id="logoFile"><br><br>
+					<span style="font-weight: lighter;">O texto da página inicial pode ser personalizado, podendo ser adicionados links e imagens. Para obter ajuda, coloque o cursor sobre a opções listadas na ajuda.</span>
+					<table>
+					<tr>
+					<td><textarea rows="15" cols="80" name="textoPaginaInicial">{{ dominio.textoPaginaInicial }}</textarea></td>
+					<td>
+					<span style="border: 10px;">
+					<h3><center>Ajuda</center></h3><br>
+					<b>Marcações disponíveis</b>(posicione o cursor sobre as opções):<br>
+					<code>
+						{% for r in marcacoes %}
+							{{ r | safe }} 
+						{% endfor %}
+					</code><br>
+					<b><i>Variáveis:</i></b><br>
+						<code>
+						{% for r in variaveis %}
+							{{ r | safe }} 
+						{% endfor %}
+						</code><br>
+					</span>
+					</td>
+					</tr>
+					</table>
+					<input type="submit" value="Salvar alterações">
+					</form>
+				</div>
+{% endblock %}

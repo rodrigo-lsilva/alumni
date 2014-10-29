@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block content %}
+					<div>
+						<h2>Convite</h2>
+						<h3>Você foi convidado pelo usuário {{ convite.de }} através
+							do e-mail {{ convite.email }}</h3>
+						<p>
+							<form action="/invite/{{ convite.chave }}" method="post">{% csrf_token %}
+								Nos informe seu nome para que possa se cadastrar
+								<p>
+									<input Type=Text Size=45 Name=termos>
+								<p>
+									<input type="radio" name="boolean" value="and" checked>
+										TODOS os termos <input type="radio" name="boolean" value="or">
+											QUALQUER dos termos
+											<p>
+												Ingresso: <select name="ingresso">
+													<option value="nenhum">Qualquer</option> {% for periodo in
+													periodos %}
+													<option value="{{ periodo }}">{{ periodo }}</option> {%
+													endfor %}
+												</select> Conclusão: <select name="conclusao">
+													<option value="nenhum">Qualquer</option> {% for periodo in
+													periodos %}
+													<option value="{{ periodo }}">{{ periodo }}</option> {%
+													endfor %}
+												</select>
+												<p>
+													<input Type=Submit Value="Pesquisar">
+														<p>
+							</form>
+						{% if registros|length > 0 %}
+						
+						<table border="0">
+							<tr>
+								<td width=100><b>Ingresso</b></td>
+								<td width=100><b>Conclusão</b></td>
+								<td width=500><b>Nome</b></td>
+							</tr>
+							{% for registro in registros %}
+							<tr>
+								<td>{{ registro.ingresso }}</td>
+								<td>{{ registro.evasao }}</td> {% if registro.usuario %}
+								<td><a href="/exist/{{ registro.usuario.id }}/">{{
+										registro.nome }}</a></td> {% else %}
+								<td><a href="/wizard/{{ registro.id }}/{{ convite.chave }}/">{{
+										registro.nome }}</a></td> {% endif %}
+							</tr>
+							{% endfor %}
+						</table>
+						{% else %} Nenhum resultado encontrado {% endif %}
+					</div>
+{% endblock %}

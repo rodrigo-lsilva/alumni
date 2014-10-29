@@ -1,0 +1,31 @@
+{% extends "base.html" %} {% block content %}
+<div>
+	<h2>Editar Dados</h2>
+	<br><p class="errorlist">{{ m3 }}</p><br></td>
+
+	<form action="/changepasswd/" method="POST">
+		{% csrf_token %}
+
+		<table border="0">
+			<tr>
+				<td width=180>Login</td>
+				<td style="font-weight: bold;">{{ user.username }}</td>
+			</tr>
+			<tr>
+				<td>Senha atual</td>
+				<td><input type="password" name="atual" value="" /><br /></td>
+			</tr>
+			<tr>
+				<td>Nova senha</td>
+				<td><input type="password" name="password" value="" /><br /></td>
+			</tr>
+			<tr>
+				<td>Confirmação da nova senha</td>
+				<td><input type="password" name="password2" value="" />
+			</tr>
+			<table>
+
+				<input type="submit" value="Salvar" />
+				</form>
+				</div>
+				{% endblock %}

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block content %}
+				<div>
+					<h2 style="text-align: center">Minhas Turmas</h2><br>
+					{% for k, v in turmas.items %}
+						<h1 style="margin-left: 50px">{{ k.getNome }}</h1><br>
+						<h1>Ingresso {{ k.getIngressoFormatado }}</h1><br>
+						<table border="0">
+								<tr style="font-weight: bold;">
+								<td>Situação</td>
+								<td>Egresso</td>
+								</tr>
+							{% for e in v.0 %}
+							    <tr>
+							    <td width="120">
+							    {% if e.0.cadastrado %}
+								Cadastrado
+							    {% else %}
+								Não Cadastrado
+							    {% endif %}
+							    </td>
+							    <td>
+							    <a href="/user_invite/{{ e.0.id }}">{{ e.0.nome }}</a><br>
+							    </td>
+							    </tr>
+							{% endfor %}
+						</table><br>
+						<h1>Conclusão {{ k.getEvasaoFormatada }}</h1><br>
+						<table border="0">
+								<tr style="font-weight: bold;">
+								<td>Situação</td>
+								<td>Conclusão</td>
+								</tr>
+							{% for e in v.0 %}
+							    <tr>
+							    <td width="120">
+							    {% if e.0.cadastrado %}
+								Cadastrado
+							    {% else %}
+								Não Cadastrado
+							    {% endif %}
+							    </td>
+							    <td>
+							    <a href="/user_invite/{{ e.0.id }}">{{ e.0.nome }}</a><br>
+							    </td>
+							    </tr>
+							{% endfor %}
+						</table><br><br>
+					{% endfor %}
+				</div>
+		{% endblock %}

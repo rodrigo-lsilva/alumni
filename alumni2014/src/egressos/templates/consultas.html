@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+				<div style="margin: auto;">
+					<h2>Consultas ao banco de dados</h2> 
+					<div class="errorlist"> {{ message }}</div>
+					<form action="/consultas/" method="post">{% csrf_token %}
+						O Alumni permite a realização de consultas SQL ao banco de dados. Para isso, digite a consulta que deseja realizar no campo 
+						consulta e clique em executar. Não operações de inserção, atualização, remoção e nem múltiplas consultas por requisição. O schema do banco de dados está disponível <a href="/static/logica/images/esquema.png" target="_blank">AQUI</a>. Exemplos de consultas SQL:<br>
+						<ul>
+						<li class="item">Consultar todas as Unidade acadêmicas: <code>SELECT id, nome FROM logica_unidadeacademica</code>;</li>
+						<li class="item">Consultar todos os egressos da graduação do período 2012.1: <code>SELECT nome FROM logica_registro_egresso r, logica_graduacao g, logica_registro_egresso_graduacao rg WHERE rg.registro_egresso_id = r.id AND rg.graduacao_id = g.id AND g.evasao='2012.1'</code>.</li>
+						</ul>
+						Consulta:<br>
+						<textarea rows="5" cols="100" name="query">{{ query }}</textarea><br>
+						<input type="submit" value="Executar consulta"><br><br>
+						<table border="1" style="border-collapse: collapse; max-width:1100px; max-height: 600px; display: block; overflow-x: scroll;">
+						{% if rotulos|length > 0 %}
+							<tr style="background: lightgray; font-weight: bold;">
+								{% for r in rotulos %}
+									<td>{{ r|title }}</td>
+								{% endfor %}
+							</tr>
+						{%  endif %}
+						{% for r in consulta %}
+							<tr>
+							{% for c in r %}
+								<td>{{ c }} </td>
+							{% endfor %}
+							</tr>
+						{% endfor %}
+						</table>
+					</form>
+				</div>
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block content %}
+				<div>
+					<h2>Convite</h2> 
+					
+					<form action="/invite/{{ convite.chave }}" method="get">
+
+					<b>De: </b>{{ convite.de }}</br>
+					<b>Para:</b> {{ convite.para.nome }}</br>
+					<b>Email:</b> {{ convite.email }} <p>
+
+					<b><h3>Registro de usuário</h3></b>
+					<table border="0">
+					<input type="hidden" name="convite_id" value="{{ convite.id }}">
+					<tr>
+					<td width=180>Nome (como vai ser exibido)</td>
+					<td><input type="text" name="nome_atual" value="{{ convite.para.nome }}" />{{ m1 }}<br /></td>
+					</tr>
+					<tr>
+					<td>Cidade onde mora</td>
+					<td><input type="text" name="cidade" value="{{ usuario.cidade }}" /><br /></td>
+					</tr>
+					<tr>
+					<td>País onde mora</td>
+					<td><input type="text" name="pais" value="{{ usuario.pais }}" /><br /></td>
+					</tr>
+					<tr>
+					<td>Local de Trabalho</td>
+					<td><input type="text" name="onde_trabalha" value="{{ usuario.onde_trabalha }}" /><br /></td>
+					</tr>
+					<tr>
+					<td>Ocupação</td>
+					<td><input type="text" name="ocupacao" value="{{ usuario.ocupacao }}" /><br /></td>
+					</tr>
+					<tr>
+					<td>Setor de Atuação</td>
+					<td><input type="text" name="setor_atucao" value="{{ usuario.setor_atucao }}" /><br /></td>
+					</tr>
+					<tr>
+					<td>Página Web</td>
+					<td><input type="text" name="pagina_web" value="{{ usuario.pagina_web }}" /><br /><p></td>
+					</tr>
+					<tr>
+					<td>Privacidade</td>
+					<td><select name="privacidade">
+					    <option value="privado">Só eu posso ver</option>
+					    <option value="publico">Todos podem ver</option>
+					</select> <br/></td>
+					</tr>
+					</table> <p>
+					<b><h3>Dados de acesso</h3></b><br>
+					O e-mail abaixo será seu login, e deve ser único.<p>
+					<table border="0">
+					<tr>
+					<td width=180>E-mail</td>
+					<td><input type="text" name="username" value="{{ convite.email }}" />{{ m2 }}<br /></td>
+					</tr>
+					<tr>
+					<td>Senha</td>
+					<td><input type="password" name="password" value="" /><br /></td>
+					</tr>
+					<tr>
+					<td>Confirmação da senha</td>
+					<td><input type="password" name="password2" value="" />{{ m3 }}<br></td>
+					</tr>
+					<table>
+
+					<input type="submit" value="Criar conta" />
+					</form>
+				</div>
+{% endblock %}

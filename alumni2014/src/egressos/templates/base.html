@@ -1,0 +1,78 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!--
+Design by Free CSS Templates
+http://www.freecsstemplates.org
+Released for free under a Creative Commons Attribution 2.5 License
+
+Name       : Angled Theme 
+Description: A two-column, fixed-width design with dark color scheme.
+Version    : 1.0
+Released   : 20131104
+
+-->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>{% block title %} Egressos {% endblock %}</title>
+<link href='http://fonts.googleapis.com/css?family=Oswald:400,300'
+	rel='stylesheet' type='text/css' />
+<link href='http://fonts.googleapis.com/css?family=Abel|Satisfy'
+	rel='stylesheet' type='text/css' />
+{% load staticfiles %}
+<link href="{% static "logica/default.css" %}" rel="stylesheet"
+	type="text/css" media="all" />
+<!--[if IE 6]>
+<link href="default_ie6.css" rel="stylesheet" type="text/css" />
+<![endif]-->
+</head>
+<body>
+	<div id="header-wrapper">
+		<div id="header">
+			<div id="logo">
+				{% load staticfiles %} <a href="/"><img src="{% static "logica/images/logo.png" %}" style="width: 456px; height: 96px"/></a>
+				<!--<h1><a href="#">Egressos CCC</a></h1>-->
+			</div>
+			<div id="menu">
+				<ul>
+					{% if user.is_authenticated %}
+						<li {% if pagina == 'home' %}class="current_page_item" {% endif %}><a href="/home/" accesskey="1"
+							title="">Home</a></li>
+						<li {% if pagina == 'edit' %}class="current_page_item" {% endif %}><a href="/edit/" accesskey="2" title="">Editar Dados</a></li>
+						<li {% if pagina == 'multiple_invites' %}class="current_page_item" {% endif %}><a href="/multiple_invites/" accesskey="3" title="">Convidar</a></li>
+						<li {% if pagina == 'invites' %}class="current_page_item" {% endif %}><a href="/invites/" accesskey="4" title="">Meus
+							Convites</a></li>
+						<li {% if pagina == 'class' %}class="current_page_item" {% endif %}><a href="/class/" accesskey="5" title="">Minhas Turmas</a></li>
+						<li {% if pagina == 'search' %}class="current_page_item" {% endif %}><a href="/search/" accesskey="6" title="">Pesquisar</a></li>
+						<li {% if pagina == 'estatisticas' %}class="current_page_item" {% endif %}><a href="/estatisticas/" accesskey="7" title="">Estatísticas</a></li>
+						{% if user.usuario.isAdministrador %}
+						<li {% if pagina == 'administracao' %}class="current_page_item" {% endif %}><a href="/administracao/" accesskey="8" title="">Administração</a></li>
+						{% endif %}
+						<li {% if pagina == 'logout' %}class="current_page_item" {% endif %}><a href="/logout/" accesskey="9" title="">Logout</a></li> 
+					    {% 	else %}
+						<li class="current_page_item"><a href="/home/" accesskey="1"
+							title="">Home</a></li>
+						<li {% if pagina == 'search' %}class="current_page_item" {% endif %}><a href="/search/" accesskey="2" title="">Pesquisar</a></li>
+						<li {% if pagina == 'login' %}class="current_page_item" {% endif %}><a href="/login/" accesskey="3" title="">Login</a></li>
+					{% endif %}
+				</ul>
+			</div>
+			</div>
+</div>
+<div id="wrapper">
+	<div id="page-wrapper">
+		<div id="page">
+			<div id="wide-content">
+			{% block content %}
+				Seja bem-vindo!
+			{% endblock %}
+			</div>
+		</div>
+	</div>
+</div>
+<div id="footer" class="container">
+        <p>Copyright (c) 2014 Departamento de Sistemas e Computação - UFCG. All rights reserved. Design by <a href="http://www.freecsstemplates.org/" rel="nofollow">FCT</a> | <a href="mailto:alumni@dsc.ufcg.edu.br?Subject=Contato">Fale Conosco</a></p>
+</div>
+</body>
+</html>
